@@ -1,12 +1,12 @@
-import React from 'react'
-import Homepage from './pages/Homepage'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/Loginpage';
+import SignUpPage from './pages/SignUpPage';
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <Homepage />
-    </div>
-  )
+    <SignUpPage/>
+  );
 }
 
-export default App
+export default App;
