@@ -23,8 +23,9 @@ const LoginPage = () => {
     console.log('Login attempt with:', username, password);
   };
 
+  
   return (
-    <div className="min-h-screen flex flex-col bg-[#E2D6C3] relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#E2D6C3] relative overflow-hidden">
       {/* Background Image */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"

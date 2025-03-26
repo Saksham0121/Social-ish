@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Volume2, VolumeX } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const GameCabinet = ({ game, isHovered, isSelected, onHover, onSelect }) => {
   return (
@@ -92,9 +93,9 @@ const GamesPage = () => {
       
       {/* Header with navigation */}
       <header className="p-6 flex justify-between items-center z-10">
-        <button className="text-neutral-800 hover:text-neutral-600 transition-colors">
+        <Link to="/" className="text-neutral-800 hover:text-neutral-600 transition-colors">
           <ChevronLeft size={28} />
-        </button>
+        </Link>
         
         <button 
           className="text-neutral-800 hover:text-neutral-600 transition-colors p-2 rounded-full"

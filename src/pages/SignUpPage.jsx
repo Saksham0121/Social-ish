@@ -8,8 +8,6 @@ const SignupForm = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-
-  // Handler functions for navigation
   const handleBackToWebsite = () => {
     navigate('/');  // Navigate to homepage
   };
