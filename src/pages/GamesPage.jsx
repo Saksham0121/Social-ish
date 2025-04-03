@@ -107,10 +107,10 @@ const GamesPage = () => {
       
       {/* Games Title with outline effect */}
       <div className="text-center mb-8 relative z-10">
-        <h1 className="text-6xl font-bold" style={{ 
+        <h1 className="text-6xl font-slackey" style={{ 
           WebkitTextStroke: '2px #1c1917',
-          color: 'transparent',
-          textShadow: '2px 2px 0px rgba(0,0,0,0.1)'
+          color: '#EEE7DC',
+          textShadow: '2px 2px 0px rgb(44, 29, 19)'
         }}>
           GAMES
         </h1>
@@ -135,7 +135,7 @@ const GamesPage = () => {
       {/* Game description panel */}
       <div className="p-4 mt-4 text-center max-w-lg mx-auto text-neutral-700">
         {selectedGame && (
-          <p className="font-mono text-sm">
+          <p className="font-mono text-sm -translate-y-4">
             {games.find(g => g.id === selectedGame)?.description || ''}
           </p>
         )}

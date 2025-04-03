@@ -20,15 +20,13 @@ const HomePage = () => {
       <div className="flex">
         <div className="w-1/2 p-12 flex items-center">
           <div>
-            <h1 className="text-7xl font-bold mb-6 text-gray-800">
+            <h1 className="font-darumadrop text-7xl -translate-y-20 font-bold mb-6 text-[#3A220E]">
               Just The Right Amount of Social.
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-brown -translate-y-20 mb-8">
               Connect, play, and explore in a comfortable, engaging way.
             </p>
-            <button className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors">
-              Get Started
-            </button>
+            
           </div>
         </div>
         <div className="w-1/2">

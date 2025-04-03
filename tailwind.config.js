@@ -5,8 +5,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        darumadrop: ["Darumadrop One", "sans-serif"], 
+        slackey: ["Slackey", "sans-serif"],// Add the font here
+      },
+    },
   },
   plugins: [],
-}
-
+};

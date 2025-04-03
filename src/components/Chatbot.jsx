@@ -26,7 +26,7 @@ const Chatbot = () => {
       {!isChatOpen ? (
         <button 
           onClick={() => setIsChatOpen(true)}
-          className="bg-orange-500 p-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
+          className="bg-amber-800 p-4 rounded-full shadow-lg hover:bg-amber-900 transition-colors"
         >
           <MessageCircle className="text-white" />
         </button>
