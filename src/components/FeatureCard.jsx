@@ -5,7 +5,7 @@ const features = [
   { 
     image: "src/Assets/Interests_card.png", 
     title: 'Interests',
-    position: 'left-[0%] top-[37%]',
+    position: 'left-[4%] top-[37%]',
     zIndex: 'z-30',
     width: 'w-64',
     height: 'h-68',
@@ -14,7 +14,7 @@ const features = [
   { 
     image: "src/Assets/Games_card.png", 
     title: 'Games',
-    position: 'left-[28%] top-[30%]',
+    position: 'left-[29%] top-[30%]',
     zIndex: 'z-40',
     width: 'w-72',
     height: 'h-52',
@@ -23,11 +23,11 @@ const features = [
   { 
     image: "src/Assets/Music_card.png", 
     title: 'Music',
-    position: 'right-[3%] top-[25%]',
+    position: 'right-[12%] top-[27%]',
     zIndex: 'z-50',
     width: 'w-80',
     height: 'h-100',
-    route: '/music'
+    route: '/mood'
   },
   { 
     image: "src/Assets/Findpeople_card.png", 
@@ -41,7 +41,7 @@ const features = [
   { 
     image: "src/Assets/Icebreakers_card.png", 
     title: 'Icebreakers',
-    position: 'right-[15%] top-[4%]',
+    position: 'right-[23%] top-[4%]',
     zIndex: 'z-60',
     width: 'w-84',
     height: 'h-60',

@@ -6,6 +6,7 @@ import SignUpPage from './pages/SignUpPage';
 import GamesPage from './pages/GamesPage';
 import HomePage from './pages/HomePage';
 import FeaturesGrid from './components/FeatureCard';
+import MoodCarousel from './pages/MoodCarousel';
 
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/features" element={<FeaturesGrid />} />
       <Route path="/games" element={<GamesPage />} />
+      <Route path="/mood" element={<MoodCarousel />} />
+
     </Routes>
   );
 }

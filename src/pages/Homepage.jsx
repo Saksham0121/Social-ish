@@ -18,7 +18,7 @@ const HomePage = () => {
 
       <Navbar />
       <div className="flex">
-        <div className="w-1/2 p-12 flex items-center">
+        <div className="w-2/5 p-12 flex items-center">
           <div>
             <h1 className="text-7xl font-bold mb-6 text-gray-800">
               Just The Right Amount of Social.
@@ -31,7 +31,7 @@ const HomePage = () => {
             </button>
           </div>
         </div>
-        <div className="w-1/2">
+        <div className="w-3/5">
           <FeaturesGrid />
         </div>
       </div>
