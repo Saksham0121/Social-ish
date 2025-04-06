@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Volume2, VolumeX } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const GameCabinet = ({ game, isHovered, isSelected, onHover, onSelect }) => {
   return (
@@ -41,6 +41,7 @@ const GamesPage = () => {
   const [selectedGame, setSelectedGame] = useState('snake-game');
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
+  const navigate = useNavigate();
   
   // REPLACE THE IMAGE PATHS WITH YOUR ACTUAL PNG IMAGE PATHS
   const games = [
@@ -48,23 +49,27 @@ const GamesPage = () => {
       id: 'flappy-bird', 
       name: 'Flappy Bird', 
       cabinetImage: 'src/Assets/flappy_bird_cabinet.png',
-      description: 'Navigate a bird through pipes by tapping to flap. How far can you go?'
+      description: 'Navigate a bird through pipes by tapping to flap. How far can you go?',
+      route: '/games/flappy-bird'
     },
     { 
       id: 'paint-grid', 
       cabinetImage: 'src/Assets/Paint grid cabinet.png',
-      description: 'Express your creativity by filling in pixels to create amazing art.'
+      description: 'Express your creativity by filling in pixels to create amazing art.',
+      route: '/games/paint-grid'
     },
     { 
       id: '2048', 
       name: '2048', 
-      cabinetImage: 'src/Assets/2048 cabinet.png',
-      description: 'Combine tiles to reach the elusive 2048 tile in this addictive puzzle game.'
+      cabinetImage: 'src/Assets/2048cabinet.png',
+      description: 'Combine tiles to reach the elusive 2048 tile in this addictive puzzle game.',
+      route: '/games/2048'
     },
     { 
       id: 'snake-game', 
       cabinetImage: 'src/Assets/snake cabinet.png',
-      description: 'Control a hungry snake as it grows longer with each piece of food. Don\'t hit the walls or yourself!'
+      description: 'Control a hungry snake as it grows longer with each piece of food. Don\'t hit the walls or yourself!',
+      route: '/games/snake-game'
     }
   ];
 
@@ -78,7 +83,13 @@ const GamesPage = () => {
   const handleGameSelect = (gameId) => {
     setSelectedGame(gameId);
     setShowOverlay(true);
-    setTimeout(() => setShowOverlay(false), 300);
+    setTimeout(() => {
+      setShowOverlay(false);
+      const selectedGame = games.find(g => g.id === gameId);
+      if (selectedGame && selectedGame.route) {
+        navigate(selectedGame.route);
+      }
+    }, 300);
   };
 
   return (

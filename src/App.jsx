@@ -9,6 +9,10 @@ import FeaturesGrid from './components/FeatureCard';
 import MoodCarousel from './pages/MoodCarousel';
 import FriendsPage from './pages/FriendsPage';
 import InterestsPage from './pages/InterestsPage';
+import ProfileSettings from './pages/ProfileSettings';
+import SnakeGame from './Games/snakegame';
+// import Game2048 from './Games/2048game';
+// import FlappyBird from './Games/flappybird';
 
 
 function App() {
@@ -20,9 +24,16 @@ function App() {
       <Route path="/features" element={<FeaturesGrid />} />
       <Route path="/games" element={<GamesPage />} />
       <Route path="/mood" element={<MoodCarousel />} />
-
+      <Route path="/profile" element={<ProfileSettings />} />
       <Route path="/friendspage" element={<FriendsPage />} />
       <Route path="/interests" element={<InterestsPage />} />
+      {/* <Route path="/games/flappy-bird" element={<FlappyBird />} />
+      <Route path="/games/paint-grid" element={<InterestsPage />} />
+      <Route path="/games/2048" element={<Game2048 />} /> */}
+      <Route path="/games/snake-game" element={<SnakeGame />} />
+
+
+      
     </Routes>
   );
 }

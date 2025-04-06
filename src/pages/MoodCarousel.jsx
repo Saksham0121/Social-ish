@@ -12,13 +12,13 @@ const MoodCarousel = () => {
   
   // Sample mood cards data - replace URLs with actual YouTube playlist links
   const moodCards = [
-    { id: 1, title: "CALM & COZY", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=calm", songs: 24 },
-    { id: 2, title: "SOFT & GENTLE", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=soft", songs: 18 },
-    { id: 3, title: "SWEET & NOSTALGIC", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=sweet", songs: 30 },
-    { id: 4, title: "UPBEAT & FUN", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=upbeat", songs: 26 },
-    { id: 5, title: "DREAMY & CALM", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=dreamy", songs: 21 },
-    { id: 6, title: "RELAXED & FOCUS", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=focus", songs: 28 },
-    { id: 7, title: "AMBIENT & CHILL", image: "/api/placeholder/400/320", playlistUrl: "https://youtube.com/playlist?list=ambient", songs: 19 },
+    { id: 1, title: "CALM & COZY", image: "src/Assets/Hufflepuff.jpeg", playlistUrl: "https://youtube.com/playlist?list=calm", songs: 24 },
+    { id: 2, title: "SOFT & GENTLE", image: "src/Assets/", playlistUrl: "https://youtube.com/playlist?list=PLn7MDcB_f91fNExr4gSl4SiRmE90dy5QF&si=8D0DS3C7bje9VwpE", songs: 18 },
+    { id: 3, title: "SWEET & NOSTALGIC", image: "src/Assets/Ishita_icecream.jpg", playlistUrl: "https://youtu.be/gBIk0pxmByw?si=t191hagZcby2DJMa", songs: 30 },
+    { id: 4, title: "UPBEAT & FUN", image: "src/Assets/upbat_and_fun.jpeg", playlistUrl: "https://youtube.com/playlist?list=upbeat", songs: 26 },
+    { id: 5, title: "DREAMY & CALM", image: "src/Assets/dreamy_and_calm.jpeg", playlistUrl: "https://youtube.com/playlist?list=PLHixPvcKjkxBmPF7Ty6vk0qJdKaY2Z7XH&si=bP-r05rJY_Farna1", songs: 21 },
+    { id: 6, title: "RELAXED & FOCUS", image: "src/Assets/relaxed_and_focused.jpeg", playlistUrl: "https://youtu.be/_4kHxtiuML0?si=CbsAo3vg5yRd8EVQ", songs: 28 },
+    { id: 7, title: "AMBIENT & CHILL", image: "src/Assets/ambient_and_chill.jpeg", playlistUrl: "https://youtube.com/playlist?list=RDQMpx_TOgynIwU&playnext=1&si=WkGmiTFg-dFrsjfB", songs: 19 },
   ];
 
   // Play background audio when component mounts
@@ -48,7 +48,7 @@ const MoodCarousel = () => {
 
   // Handler functions for navigation
   const handleBackToWebsite = () => {
-    navigate('/');  // Navigate to homepage
+    navigate('/');
   };
 
   const toggleBackgroundAudio = () => {
@@ -60,13 +60,6 @@ const MoodCarousel = () => {
       }
       setIsAudioPlaying(!isAudioPlaying);
     }
-  };
-
-  const handleBackClick = () => {
-    // Navigate back to homepage
-    // Replace with your actual navigation logic
-    console.log("Navigating back to homepage");
-    // Example: window.location.href = "/";
   };
   
   const handleCardClick = (index) => {
@@ -210,7 +203,7 @@ const MoodCarousel = () => {
         {[...Array(20)].map((_, i) => (
           <div 
             key={i}
-            className="absolute text-amber-800 opacity-20"
+            className="absolute text-amber-800 opacity-60"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
@@ -281,7 +274,7 @@ const MoodCarousel = () => {
         <h1 
           className="text-4xl md:text-6xl font-bold text-stone-800" 
           style={{ 
-            fontFamily: "'Impact', sans-serif",
+            fontFamily: "slackey",
             textShadow: "2px 2px 4px rgba(0,0,0,0.1)"
           }}
         >
@@ -353,7 +346,7 @@ const MoodCarousel = () => {
                   
                   {/* ENHANCED Song count badge */}
                   <div 
-                    className="music-badge absolute bottom-3 left-3 bg-amber-800 py-2 px-4 rounded-lg text-white text-sm font-medium flex items-center shadow-lg"
+                    className="music-badge absolute bottom-3 left-3 bg-amber-900 py-2 px-4 rounded-lg text-white text-sm font-medium flex items-center shadow-lg"
                   >
                     <Music size={18} className="mr-2" />
                     <span className="mr-1">{card.songs}</span> 
@@ -375,7 +368,7 @@ const MoodCarousel = () => {
                 </div>
                 
                 <div 
-                  className={`w-full h-1/5 flex items-center justify-center ${index === activeIndex ? 'bg-amber-800 text-amber-50' : 'bg-amber-200 text-amber-900'}`}
+                  className={`w-full h-1/5 flex items-center justify-center ${index === activeIndex ? 'bg-amber-900 text-amber-50' : 'bg-[#E0B980] text-amber-900'}`}
                 >
                   <div className="flex items-center justify-center">
                     {index === activeIndex && isPlaying && <Volume2 size={20} className="mr-2 animate-pulse" />}
