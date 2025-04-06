@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowLeft, Music, Volume2, Heart, Share2, Pause } from 'lucide-react';
 
 const MoodCarousel = () => {
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(3); // Start with middle card active
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFavorite, setIsFavorite] = useState([false, false, false, false, false, false, false]);
@@ -61,7 +63,6 @@ const MoodCarousel = () => {
       setIsAudioPlaying(!isAudioPlaying);
     }
   };
-  
   const handleCardClick = (index) => {
     if (index === activeIndex) {
       // Toggle play state for active card
