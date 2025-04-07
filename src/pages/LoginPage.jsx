@@ -1,28 +1,56 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginWithUsername } from '../firebase/auth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handler functions for navigation
+  useEffect(() => {
+    console.log("LoginPage component mounted");
+  }, []);
+
   const handleBackToWebsite = () => {
-    navigate('/');  // Navigate to homepage
+    console.log("Back to website clicked");
+    navigate('/');
   };
 
-  // Toggle password visibility
   const togglePasswordVisibility = () => {
+    console.log("Toggle password visibility clicked");
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  // Simplified submit handler
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Login logic would go here
-    console.log('Login attempt with:', username, password);
+    console.log("Form submitted, attempting login...");
+    
+    // Validation check
+    if (!username || !password) {
+      setError('Please enter both username and password.');
+      return;
+    }
+    
+    setError('');
+    setIsSubmitting(true);
+  
+    try {
+      console.log("Calling loginWithUsername with:", username);
+      const result = await loginWithUsername(username, password);
+      console.log("Login result:", result);
+      console.log("Login successful, navigating to homepage");
+      navigate('/');
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError('Invalid username or password. Please check your credentials and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
   
   return (
     <div className="h-screen flex flex-col bg-[#E2D6C3] relative overflow-hidden">
@@ -70,6 +98,7 @@ const LoginPage = () => {
                 Welcome Back!
               </h1>
               
+              {/* Fixed form submission */}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="username" className="block text-gray-800 font-bold mb-1">Username</label>
@@ -115,11 +144,19 @@ const LoginPage = () => {
                   </div>
                 </div>
                 
+                {error && (
+                  <div className="mb-4 text-red-600 text-sm font-medium">
+                    {error}
+                  </div>
+                )}
+                
+                {/* Fixed submit button */}
                 <button 
-                  type="submit" 
-                  className="w-full bg-black text-white p-3 sm:p-4 rounded-xl font-bold hover:bg-gray-900 transition"
+                  type="submit"
+                  className="w-full bg-black text-white p-3 sm:p-4 rounded-xl font-bold hover:bg-gray-900 transition cursor-pointer z-20 relative"
+                  disabled={isSubmitting}
                 >
-                  Login
+                  {isSubmitting ? "Logging in..." : "Login"}
                 </button>
               </form>
               
