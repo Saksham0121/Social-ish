@@ -1,57 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { loginWithUsername } from '../firebase/auth';
+import { useNavigate, Link } from 'react-router-dom';
+import { auth,db } from '../firebase/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Check authentication status on component mount
   useEffect(() => {
-    console.log("LoginPage component mounted");
-  }, []);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is already signed in, redirect to homepage
+        navigate('/');
+      }
+    });
 
+    return () => unsubscribe();
+  }, [navigate]);
+
+  // Handler functions for navigation
   const handleBackToWebsite = () => {
-    console.log("Back to website clicked");
-    navigate('/');
+    navigate('/');  // Navigate to homepage
   };
 
+  // Toggle password visibility
   const togglePasswordVisibility = () => {
-    console.log("Toggle password visibility clicked");
     setShowPassword(!showPassword);
   };
 
-  // Simplified submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted, attempting login...");
-    
-    // Validation check
-    if (!username || !password) {
-      setError('Please enter both username and password.');
-      return;
-    }
-    
     setError('');
-    setIsSubmitting(true);
-  
+    setLoading(true);
+
     try {
-      console.log("Calling loginWithUsername with:", username);
-      const result = await loginWithUsername(username, password);
-      console.log("Login result:", result);
-      console.log("Login successful, navigating to homepage");
+      // Check if input is email or username
+      const isEmail = usernameOrEmail.includes('@');
+      
+      if (isEmail) {
+        // Direct login with email
+        await signInWithEmailAndPassword(auth, usernameOrEmail, password);
+      } else {
+        // If username is provided, find corresponding email
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", usernameOrEmail)
+        );
+        
+        const querySnapshot = await getDocs(userQuery);
+        
+        if (querySnapshot.empty) {
+          throw new Error('No user found with this username');
+        }
+        
+        const userDoc = querySnapshot.docs[0];
+        const email = userDoc.data().email;
+        
+        // Login with retrieved email
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+
+      // Redirect to homepage on successful login
       navigate('/');
-    } catch (err) {
-      console.error("Login failed:", err);
-      setError('Invalid username or password. Please check your credentials and try again.');
+    } catch (error) {
+      let errorMessage = 'Failed to log in';
+      
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMessage = 'Invalid username/email or password';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed login attempts. Please try again later.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
-  
+
   return (
     <div className="h-screen flex flex-col bg-[#E2D6C3] relative overflow-hidden">
       {/* Background Image */}
@@ -98,15 +131,16 @@ const LoginPage = () => {
                 Welcome Back!
               </h1>
               
-              {/* Fixed form submission */}
+              {error && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>}
+              
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="username" className="block text-gray-800 font-bold mb-1">Username</label>
+                  <label htmlFor="username" className="block text-gray-800 font-bold mb-1">Username or Email</label>
                   <input 
                     id="username"
                     type="text" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={usernameOrEmail}
+                    onChange={(e) => setUsernameOrEmail(e.target.value)}
                     className="w-full p-2 sm:p-3 bg-[#D5C9B6] rounded mb-3 border-none focus:outline-none focus:ring-2 focus:ring-gray-400"
                     required
                   />
@@ -144,19 +178,12 @@ const LoginPage = () => {
                   </div>
                 </div>
                 
-                {error && (
-                  <div className="mb-4 text-red-600 text-sm font-medium">
-                    {error}
-                  </div>
-                )}
-                
-                {/* Fixed submit button */}
                 <button 
-                  type="submit"
-                  className="w-full bg-black text-white p-3 sm:p-4 rounded-xl font-bold hover:bg-gray-900 transition cursor-pointer z-20 relative"
-                  disabled={isSubmitting}
+                  type="submit" 
+                  className="w-full bg-black text-white p-3 sm:p-4 rounded-xl font-bold hover:bg-gray-900 transition"
+                  disabled={loading}
                 >
-                  {isSubmitting ? "Logging in..." : "Login"}
+                  {loading ? 'Logging in...' : 'Login'}
                 </button>
               </form>
               
