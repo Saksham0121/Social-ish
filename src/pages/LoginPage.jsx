@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { auth,db } from '../firebase/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is already signed in, redirect to homepage
+        navigate('/');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   // Handler functions for navigation
   const handleBackToWebsite = () => {
@@ -17,13 +34,57 @@ const LoginPage = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Login logic would go here
-    console.log('Login attempt with:', username, password);
+    setError('');
+    setLoading(true);
+
+    try {
+      // Check if input is email or username
+      const isEmail = usernameOrEmail.includes('@');
+      
+      if (isEmail) {
+        // Direct login with email
+        await signInWithEmailAndPassword(auth, usernameOrEmail, password);
+      } else {
+        // If username is provided, find corresponding email
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", usernameOrEmail)
+        );
+        
+        const querySnapshot = await getDocs(userQuery);
+        
+        if (querySnapshot.empty) {
+          throw new Error('No user found with this username');
+        }
+        
+        const userDoc = querySnapshot.docs[0];
+        const email = userDoc.data().email;
+        
+        // Login with retrieved email
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+
+      // Redirect to homepage on successful login
+      navigate('/');
+    } catch (error) {
+      let errorMessage = 'Failed to log in';
+      
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMessage = 'Invalid username/email or password';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed login attempts. Please try again later.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  
   return (
     <div className="h-screen flex flex-col bg-[#E2D6C3] relative overflow-hidden">
       {/* Background Image */}
@@ -70,14 +131,16 @@ const LoginPage = () => {
                 Welcome Back!
               </h1>
               
+              {error && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>}
+              
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="username" className="block text-gray-800 font-bold mb-1">Username</label>
+                  <label htmlFor="username" className="block text-gray-800 font-bold mb-1">Username or Email</label>
                   <input 
                     id="username"
                     type="text" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={usernameOrEmail}
+                    onChange={(e) => setUsernameOrEmail(e.target.value)}
                     className="w-full p-2 sm:p-3 bg-[#D5C9B6] rounded mb-3 border-none focus:outline-none focus:ring-2 focus:ring-gray-400"
                     required
                   />
@@ -118,8 +181,9 @@ const LoginPage = () => {
                 <button 
                   type="submit" 
                   className="w-full bg-black text-white p-3 sm:p-4 rounded-xl font-bold hover:bg-gray-900 transition"
+                  disabled={loading}
                 >
-                  Login
+                  {loading ? 'Logging in...' : 'Login'}
                 </button>
               </form>
               

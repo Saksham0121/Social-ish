@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Edit2, Check, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, updateProfile, updateEmail } from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/firebase';
 
-const ProfileSettings = () => {
-  // User data state (would normally come from authentication context)
+const ProfilePage = () => {
+  const auth = getAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // User data state
   const [userData, setUserData] = useState({
-    username: "johndoe123",
-    fullname: "John Doe",
-    email: "johndoe@example.com",
-    dob: "1990-01-01",
-    gender: "Male",
-    phoneNo: "+1 234 567 8900",
+    username: "",
+    fullname: "",
+    email: "",
+    dob: "",
+    gender: "",
+    phoneNo: "",
     status: "Hey there! I'm using Social-ish"
   });
 
@@ -22,11 +29,65 @@ const ProfileSettings = () => {
   // Profile picture options and selection
   const [selectedProfile, setSelectedProfile] = useState(0);
   const profileOptions = [
-    "/api/placeholder/100/100",
-    "/api/placeholder/100/100",
-    "/api/placeholder/100/100",
-    "/api/placeholder/100/100"
+    "src/Assets/blue.jpeg",
+    "src/Assets/brown.jpeg",
+    "/src/Assets/pink.jpeg",
+    "src/Assets/green.jpeg"
   ];
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Check if user is authenticated
+        const user = auth.currentUser;
+        if (!user) {
+          navigate('/login');
+          return;
+        }
+
+        // Get basic info from auth object
+        const basicUserData = {
+          username: user.displayName?.split(' ')[0] || '',
+          fullname: user.displayName || '',
+          email: user.email || '',
+        };
+
+        // Get additional info from Firestore
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        let additionalData = {};
+        if (userDoc.exists()) {
+          additionalData = userDoc.data();
+        } else {
+          // Create user document if it doesn't exist
+          await setDoc(userDocRef, {
+            userId: user.uid,
+            dob: '',
+            gender: '',
+            phoneNo: user.phoneNumber || '',
+            status: "Hey there! I'm using Social-ish",
+            createdAt: new Date()
+          });
+        }
+
+        // Merge data
+        setUserData({
+          ...basicUserData,
+          ...additionalData
+        });
+        
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load profile data. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [auth, navigate]);
 
   // Handle editing field
   const startEditing = (field, value) => {
@@ -35,13 +96,35 @@ const ProfileSettings = () => {
   };
 
   // Save edited field
-  const saveEdit = () => {
-    if (editingField) {
+  const saveEdit = async () => {
+    if (!editingField) return;
+    
+    try {
+      const user = auth.currentUser;
+      const userDocRef = doc(db, 'users', user.uid);
+      
+      // Update state optimistically
       setUserData({
         ...userData,
         [editingField]: editValue
       });
+      
+      // Handle Firebase Auth fields
+      if (editingField === 'fullname') {
+        await updateProfile(user, { displayName: editValue });
+      } else if (editingField === 'email') {
+        await updateEmail(user, editValue);
+      } else {
+        // Update in Firestore
+        await updateDoc(userDocRef, {
+          [editingField]: editValue
+        });
+      }
+      
       setEditingField(null);
+    } catch (err) {
+      console.error("Error updating field:", err);
+      alert("Failed to update. Please try again.");
     }
   };
 
@@ -50,39 +133,76 @@ const ProfileSettings = () => {
     setEditingField(null);
   };
 
+  // Save all changes
+  const saveAllChanges = async () => {
+    try {
+      const user = auth.currentUser;
+      const userDocRef = doc(db, 'users', user.uid);
+      
+      // Save profile picture selection to Firestore
+      await updateDoc(userDocRef, {
+        profilePictureIndex: selectedProfile
+      });
+      
+      alert("All changes saved successfully!");
+    } catch (err) {
+      console.error("Error saving changes:", err);
+      alert("Failed to save changes. Please try again.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-6 bg-white rounded-lg shadow-md max-w-md">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-30"
         style={{
-          backgroundImage: "url('src/Assets/bgSocialish.png')"
+          backgroundImage: "url('src/Assets/bgSocialish.png')" // Replace with your background image
         }}
       ></div>
-      {/* Background image placeholder - you'll provide this yourself */}
+      
       <div className="absolute top-4 left-4">
-        <Link to="/" className="flex justify-start items-center text-amber-700 hover:text-amber-900">
+        <Link to="/" className="flex items-center text-amber-700 hover:text-amber-900">
           <ArrowLeft className="mr-2" size={30} />
         </Link>
       </div>
 
-      
-
-      <div className="container mx-auto px-4 pt-8 relative z-10">
-        {/* Back button */}
-        {/* <Link to="/" className="inline-flex items-center text-amber-700 hover:text-amber-900 mb-6">
-          <ArrowLeft className="mr-2" size={20} />
-          <span className="font-medium">Back to Home</span>
-        </Link> */}
-
+      <div className="container mx-auto px-4 pt-16 relative z-10">
         {/* Profile section */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden max-w-4xl mx-auto">
+        <div className="bg-[#E2D6C3] rounded-lg shadow-md overflow-hidden max-w-4xl mx-auto">
           {/* Profile header with image */}
           <div className="flex flex-col items-center pt-12 pb-6">
             <div className="relative">
               <img 
-                src={profileOptions[selectedProfile]} 
+                src={"src/Assets/norm.jpeg"}  //header ke liye yahan pe daalna hai
                 alt="Profile" 
-                className="w-24 h-24 rounded-full border-4 border-amber-500"
+                className="w-24 h-24 rounded-full border-2"
               />
             </div>
             <h1 className="text-2xl font-bold mt-4 text-gray-800">{userData.fullname}</h1>
@@ -92,7 +212,7 @@ const ProfileSettings = () => {
           <div className="grid md:grid-cols-2 gap-6 p-6">
             {/* Left side - User details */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold border-b pb-2 text-amber-700">User Information</h2>
+              <h2 className="text-xl font-semibold border-b pb-2 text-amber-900">User Information</h2>
               
               {/* Username */}
               <div className="flex justify-between items-center">
@@ -106,7 +226,32 @@ const ProfileSettings = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500">Full Name</p>
-                  <p className="font-medium">{userData.fullname}</p>
+                  {editingField === 'fullname' ? (
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        className="border rounded p-1 text-sm"
+                      />
+                      <button onClick={saveEdit} className="ml-2 text-green-600">
+                        <Check size={16} />
+                      </button>
+                      <button onClick={cancelEdit} className="ml-1 text-red-600">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <p className="font-medium">{userData.fullname}</p>
+                      <button 
+                        onClick={() => startEditing('fullname', userData.fullname)}
+                        className="ml-2 text-amber-600 hover:text-amber-800"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -114,7 +259,32 @@ const ProfileSettings = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{userData.email}</p>
+                  {editingField === 'email' ? (
+                    <div className="flex items-center">
+                      <input
+                        type="email"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        className="border rounded p-1 text-sm"
+                      />
+                      <button onClick={saveEdit} className="ml-2 text-green-600">
+                        <Check size={16} />
+                      </button>
+                      <button onClick={cancelEdit} className="ml-1 text-red-600">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <p className="font-medium">{userData.email}</p>
+                      <button 
+                        onClick={() => startEditing('email', userData.email)}
+                        className="ml-2 text-amber-600 hover:text-amber-800"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -139,9 +309,9 @@ const ProfileSettings = () => {
                     </div>
                   ) : (
                     <div className="flex items-center">
-                      <p className="font-medium">{userData.dob}</p>
+                      <p className="font-medium">{userData.dob || 'Not set'}</p>
                       <button 
-                        onClick={() => startEditing('dob', userData.dob)}
+                        onClick={() => startEditing('dob', userData.dob || '')}
                         className="ml-2 text-amber-600 hover:text-amber-800"
                       >
                         <Edit2 size={16} />
@@ -162,6 +332,7 @@ const ProfileSettings = () => {
                         onChange={(e) => setEditValue(e.target.value)}
                         className="border rounded p-1 text-sm"
                       >
+                        <option value="">Select gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
@@ -176,9 +347,9 @@ const ProfileSettings = () => {
                     </div>
                   ) : (
                     <div className="flex items-center">
-                      <p className="font-medium">{userData.gender}</p>
+                      <p className="font-medium">{userData.gender || 'Not set'}</p>
                       <button 
-                        onClick={() => startEditing('gender', userData.gender)}
+                        onClick={() => startEditing('gender', userData.gender || '')}
                         className="ml-2 text-amber-600 hover:text-amber-800"
                       >
                         <Edit2 size={16} />
@@ -209,9 +380,9 @@ const ProfileSettings = () => {
                     </div>
                   ) : (
                     <div className="flex items-center">
-                      <p className="font-medium">{userData.phoneNo}</p>
+                      <p className="font-medium">{userData.phoneNo || 'Not set'}</p>
                       <button 
-                        onClick={() => startEditing('phoneNo', userData.phoneNo)}
+                        onClick={() => startEditing('phoneNo', userData.phoneNo || '')}
                         className="ml-2 text-amber-600 hover:text-amber-800"
                       >
                         <Edit2 size={16} />
@@ -226,7 +397,7 @@ const ProfileSettings = () => {
             <div>
               {/* Status */}
               <div className="mb-6">
-                <h2 className="text-xl font-semibold border-b pb-2 mb-4 text-amber-700">Status</h2>
+                <h2 className="text-xl font-semibold border-b pb-2 mb-4 text-amber-900">Status</h2>
                 {editingField === 'status' ? (
                   <div>
                     <textarea
@@ -265,7 +436,7 @@ const ProfileSettings = () => {
               
               {/* Profile Picture Selection */}
               <div>
-                <h2 className="text-xl font-semibold border-b pb-2 mb-4 text-amber-700">Profile Picture</h2>
+                <h2 className="text-xl font-semibold border-b pb-2 mb-4 text-amber-900">Profile Picture</h2>
                 <div className="grid grid-cols-4 gap-4">
                   {profileOptions.map((profile, index) => (
                     <div 
@@ -287,7 +458,10 @@ const ProfileSettings = () => {
           
           {/* Save button at bottom */}
           <div className="bg-gray-50 px-6 py-4 flex justify-end">
-            <button className="px-6 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 font-medium">
+            <button 
+              onClick={saveAllChanges}
+              className="px-6 py-2 bg-amber-700 text-white rounded-md hover:bg-amber-900 font-medium"
+            >
               Save Changes
             </button>
           </div>
@@ -297,4 +471,4 @@ const ProfileSettings = () => {
   );
 };
 
-export default ProfileSettings;
+export default ProfilePage;
