@@ -9,12 +9,13 @@ import FeaturesGrid from './components/FeatureCard';
 import MoodCarousel from './pages/MoodCarousel';
 import FriendsPage from './pages/FriendsPage';
 import InterestsPage from './pages/InterestsPage';
-import { AuthProvider } from './contexts/authContext'; // ✅ Import the AuthProvider
+import { AuthProvider } from './contexts/authContext'; //Import the AuthProvider
 import IcebreakersBook from './pages/IcebreakerPage';
+import CalmZone from './pages/CalmZone';
 
 function App() {
   return (
-    <AuthProvider> {/* ✅ Wrap your whole app in AuthProvider */}
+    <AuthProvider> {/* Wrap your whole app in AuthProvider */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -25,6 +26,7 @@ function App() {
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
         <Route path="/icebreakers" element={<IcebreakersBook />} />
+        <Route path="/calmzone" element={<CalmZone />} />
 
       </Routes>
     </AuthProvider>
