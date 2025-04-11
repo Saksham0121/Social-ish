@@ -65,9 +65,9 @@ function InterestsPage() {
   };
 
   return (
-    <div className="h-screen flex justify-center items-center overflow-hidden" 
+    <div className="h-screen flex justify-center items-center overflow-hidden " 
          style={{ backgroundImage: "url('src/Assets/bgSocialish.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
-      <div className="w-[80%] h-[90%] bg-[#E2D6C3] rounded-lg p-6 shadow-md border border-[#B29A86] flex flex-col">
+      <div className="w-[80%] h-[90%] bg-[#E2D6C3] rounded-lg p-4 shadow-md border border-[#B29A86] flex flex-col">
         <h1 className="text-4xl font-slackey text-center text-[#5A3E2B] mb-6">Interests</h1>
         <div className="grid grid-cols-2 gap-6 flex-grow">
           {[
