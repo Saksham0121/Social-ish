@@ -56,7 +56,7 @@ const GamesPage = () => {
       id: 'paint-grid', 
       cabinetImage: 'src/Assets/Paint grid cabinet.png',
       description: 'Express your creativity by filling in pixels to create amazing art.',
-      route: '/games/paint-grid'
+      route: '/games/puzzle'
     },
     { 
       id: '2048', 
