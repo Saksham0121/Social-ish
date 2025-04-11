@@ -10,8 +10,7 @@ import MoodCarousel from './pages/MoodCarousel';
 import FriendsPage from './pages/FriendsPage';
 import InterestsPage from './pages/InterestsPage';
 import { AuthProvider } from './contexts/authContext'; //Import the AuthProvider
-import IcebreakersBook from './pages/IcebreakerPage';
-import CalmZone from './pages/CalmZone';
+import IcebreakersPage from './pages/IcebreakerPage';
 
 function App() {
   return (
@@ -25,9 +24,7 @@ function App() {
         <Route path="/mood" element={<MoodCarousel />} />
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
-        <Route path="/icebreakers" element={<IcebreakersBook />} />
-        <Route path="/calmzone" element={<CalmZone />} />
-
+        <Route path='/icebreakers' element={<IcebreakersPage/>} />
       </Routes>
     </AuthProvider>
   );

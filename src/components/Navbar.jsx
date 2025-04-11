@@ -20,8 +20,8 @@ const Navbar = () => {
                     </Link>
                 </div>
                 <div className="group relative">
-                    <Link to="/settings" className="hover:text-amber-900 text-2xl font-darumadrop transition-colors">
-                        Settings
+                    <Link to="/profile" className="hover:text-amber-900 text-2xl font-darumadrop transition-colors">
+                        Profile
                         <div className="absolute left-0 bottom-[-5px] h-[2px] w-0 group-hover:w-full bg-amber-900 transition-all duration-300"></div>
                     </Link>
                 </div>
