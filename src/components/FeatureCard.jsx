@@ -31,12 +31,12 @@ const features = [
   },
   { 
     image: "src/Assets/Findpeople_card.png", 
-    title: 'Meet People',
-    position: 'left-[22%] top-[58%]',
+    title: 'Find People',
+    position: 'left-[25%] top-[58%]',
     zIndex: 'z-40',
     width: 'w-68',
     height: 'h-64',
-    route: '/meetpeople'
+    route: '/findpeople'
   },
   { 
     image: "src/Assets/Icebreakers_card.png", 
