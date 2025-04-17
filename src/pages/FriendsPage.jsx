@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { FaSearch, FaUserCircle, FaCommentDots, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Import for routing
 
 const FriendsPage = () => {
+  const navigate = useNavigate(); // Hook for navigation
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState([
     { id: 1, username: 'Unnati Sachdeva' },
@@ -36,6 +38,11 @@ const FriendsPage = () => {
     setFriendRequests(friendRequests.filter(request => request.id !== requestId));
   };
 
+  // Handle chat button click
+  const handleChatClick = () => {
+    navigate(`/chat/`); // Navigate to chat page with friend ID
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center p-10 overflow-hidden font-[Amethysta]">
       {/* Background Image */}
@@ -47,7 +54,7 @@ const FriendsPage = () => {
       {/* Back Arrow */}
       <FaArrowLeft 
         className="absolute top-5 left-5 text-[#4D2C27] text-3xl cursor-pointer hover:text-gray-600 transition-transform duration-300 transform hover:scale-110"
-        onClick={() => (window.location.href = '/')} // Replace with navigate() if using React Router
+        onClick={() => navigate('/')} // Using navigate instead of direct location change
       />
 
       <div className="relative z-10 w-full max-w-5xl flex justify-center space-x-10">
@@ -81,7 +88,10 @@ const FriendsPage = () => {
                   <FaUserCircle className="w-10 h-10 text-white mr-4 transition-all duration-300 ease-in-out transform hover:scale-125" />
                   <span className="font-medium text-black text-lg">{friend.username}</span>
                 </div>
-                <FaCommentDots className="w-6 h-6 text-white cursor-pointer hover:text-gray-900 transition-transform duration-300" />
+                <FaCommentDots 
+                  className="w-6 h-6 text-white cursor-pointer hover:text-gray-900 transition-transform duration-300" 
+                  onClick={() => handleChatClick(friend.id)} // Added click handler
+                />
               </div>
             ))}
           </div>

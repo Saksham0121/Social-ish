@@ -17,6 +17,7 @@ import Game2048 from './Games/2048game';
 import FlappyBird from './Games/flappybird';
 import JigsawPuzzle from './Games/puzzlegame';
 import NearbyConnect from './pages/Findpeople';
+import ChatApp from './pages/ChatPage';
 
 
 function App() {
@@ -37,6 +38,8 @@ function App() {
         <Route path="/games/2048" element={<Game2048 />} />
         <Route path="/games/snake-game" element={<SnakeGame />} />
         <Route path="/icebreakers" element={<IcebreakersBook />} />
+        <Route path="/chat" element={<ChatApp />} />
+
 
       </Routes>
     </AuthProvider>
