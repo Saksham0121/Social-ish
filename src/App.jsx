@@ -39,8 +39,6 @@ function App() {
         <Route path="/games/snake-game" element={<SnakeGame />} />
         <Route path="/icebreakers" element={<IcebreakersBook />} />
         <Route path="/chat" element={<ChatApp />} />
-
-
       </Routes>
     </AuthProvider>
   );
