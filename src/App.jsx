@@ -19,6 +19,7 @@ import JigsawPuzzle from './Games/puzzlegame';
 import NearbyConnect from './pages/Findpeople';
 import BluetoothFinderPage from './pages/Findpeople';
 import ChatApp from './pages/chating';
+import CalmZone from './pages/calmzone';
 
 
 function App() {
@@ -32,6 +33,9 @@ function App() {
         <Route path="/games" element={<GamesPage />} />
         <Route path="/findpeople" element={<BluetoothFinderPage />} />
         <Route path="/mood" element={<MoodCarousel />} />
+        <Route path="/calmzone" element={<CalmZone />} />
+
+        
         <Route path="/profile" element={<ProfileSettings />} />
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
