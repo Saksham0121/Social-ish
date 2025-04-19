@@ -63,6 +63,7 @@ const MoodCarousel = () => {
       setIsAudioPlaying(!isAudioPlaying);
     }
   };
+  
   const handleCardClick = (index) => {
     if (index === activeIndex) {
       // Toggle play state for active card
@@ -111,6 +112,7 @@ const MoodCarousel = () => {
     }
   };
   
+  // Fixed scrolling functions to prevent glitching
   const scrollToPrev = () => {
     setActiveIndex((prevIndex) => 
       prevIndex === 0 ? moodCards.length - 1 : prevIndex - 1
@@ -136,46 +138,57 @@ const MoodCarousel = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
   
-  // Calculate position and z-index for each card based on its relation to active card
+  // Fixed card positioning function to prevent glitching
   const getCardStyle = (index) => {
-    const diff = index - activeIndex;
-    const wrappedDiff = ((diff + moodCards.length) % moodCards.length);
+    // Calculate minimum distance between cards (accounting for wrapping)
+    const calculateDistance = (idx1, idx2, length) => {
+      const directDist = Math.abs(idx1 - idx2);
+      const wrapDist = length - directDist;
+      return Math.min(directDist, wrapDist);
+    };
     
-    // Adjust for shorter wrapping distance
-    const adjustedDiff = wrappedDiff > moodCards.length / 2 
-      ? wrappedDiff - moodCards.length 
-      : wrappedDiff;
+    // Calculate if the card is to the left or right of active (accounting for wrapping)
+    const isToTheRight = (idx, activeIdx, length) => {
+      if (idx === activeIdx) return false;
+      const directDist = Math.abs(idx - activeIdx);
+      const wrapDist = length - directDist;
+      
+      if (directDist <= wrapDist) {
+        return idx > activeIdx;
+      } else {
+        return idx < activeIdx;
+      }
+    };
     
+    // Get minimum distance to active card
+    const distance = calculateDistance(index, activeIndex, moodCards.length);
+    const toTheRight = isToTheRight(index, activeIndex, moodCards.length);
+    
+    // Default styling
     let translateX = 0;
     let scale = 1;
-    let zIndex = 10;
-    let opacity = 1; // All cards fully opaque
+    let zIndex = 30 - distance; // Higher z-index for cards closer to active
+    let opacity = 1;
     let rotate = 0;
     
-    if (adjustedDiff === 0) {
+    if (distance === 0) {
       // Active card
       translateX = 0;
       scale = 1;
       zIndex = 30;
-      rotate = 0;
-    } else if (adjustedDiff > 0 && adjustedDiff <= 2) {
-      // Cards to the right
-      translateX = 120 + (adjustedDiff - 1) * 80; // Increased spacing
-      scale = 0.85 - (adjustedDiff * 0.05);
-      zIndex = 20 - adjustedDiff;
-      rotate = 8 * adjustedDiff; // Enhanced rotation for better 3D effect
-    } else if (adjustedDiff < 0 && adjustedDiff >= -2) {
-      // Cards to the left
-      translateX = -120 + (adjustedDiff + 1) * 80; // Increased spacing
-      scale = 0.85 - (Math.abs(adjustedDiff) * 0.05);
-      zIndex = 20 - Math.abs(adjustedDiff);
-      rotate = -8 * Math.abs(adjustedDiff); // Enhanced rotation for better 3D effect
+    } else if (distance <= 2) {
+      // Cards close to active (within 2 positions)
+      const direction = toTheRight ? 1 : -1;
+      translateX = direction * (120 + (distance - 1) * 80);
+      scale = 0.85 - (distance * 0.05);
+      rotate = direction * (8 * distance);
     } else {
-      // Hide cards that are too far from active
-      translateX = adjustedDiff > 0 ? 280 : -280; // Positioned further away
+      // Cards further away
+      const direction = toTheRight ? 1 : -1;
+      translateX = direction * 280;
       scale = 0.7;
       zIndex = 5;
-      rotate = adjustedDiff > 0 ? 15 : -15; // More rotation for dynamic effect
+      rotate = direction * 15;
     }
     
     return {
@@ -251,9 +264,9 @@ const MoodCarousel = () => {
       {/* Back button */}
       <button 
         onClick={handleBackToWebsite}
-        className="absolute top-6 left-6 z-50 flex items-center text-stone-800 hover:text-amber-800 transition-colors bg-white px-4 py-2 rounded-full hover:bg-amber-100 shadow-md"
+        className="absolute top-7 left-8 z-50 flex items-center text-stone-800 hover:text-amber-800 transition-colors px-4 py-2 rounded-full hover:bg-amber-100"
       >
-        <ArrowLeft size={24} className="mr-1" />
+        <ChevronLeft size={24} className="mr-1" />
         
       </button>
       
@@ -292,20 +305,20 @@ const MoodCarousel = () => {
       )}
       
       {/* Carousel container */}
-      <div className="relative w-full max-w-5xl h-96 flex items-center justify-center z-10">
+      <div className="relative w-full max-w-5xl h-96 flex items-center justify-center z-10 perspective-1000">
         {/* Navigation buttons */}
         <button 
           onClick={scrollToPrev}
-          className="absolute left-4 md:left-8 z-40 bg-white rounded-full p-3 shadow-lg hover:bg-amber-100 transition-all hover:scale-110"
+          className="absolute left-4 md:left-8 z-40 rounded-full p-3 shadow-lg hover:bg-amber-100 transition-all hover:scale-110"
         >
-          <ChevronLeft size={36} />
+          <ChevronLeft size={32} />
         </button>
         
         <div ref={carouselRef} className="relative w-full h-full flex items-center justify-center">
           {moodCards.map((card, index) => (
             <div
               key={card.id}
-              className="absolute cursor-pointer transition-all duration-300 ease-in-out"
+              className="absolute cursor-pointer"
               style={{
                 ...getCardStyle(index),
                 width: '280px', // Larger cards
@@ -345,7 +358,7 @@ const MoodCarousel = () => {
                     </button>
                   </div>
                   
-                  {/* ENHANCED Song count badge */}
+                  {/* Song count badge */}
                   <div 
                     className="music-badge absolute bottom-3 left-3 bg-amber-900 py-2 px-4 rounded-lg text-white text-sm font-medium flex items-center shadow-lg"
                   >

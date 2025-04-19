@@ -16,31 +16,29 @@ import SnakeGame from './Games/snakegame';
 import Game2048 from './Games/2048game';
 import FlappyBird from './Games/flappybird';
 import JigsawPuzzle from './Games/puzzlegame';
-import NearbyConnect from './pages/Findpeople';
 import BluetoothFinderPage from './pages/Findpeople';
-import ChatApp from './pages/chating';
 import CalmZone from './pages/calmzone';
+import AboutUs from './pages/aboutus';
 
 
 function App() {
   return (
-    <AuthProvider> {/* ✅ Wrap your whole app in AuthProvider */}
+    <AuthProvider>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<ChatApp />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/features" element={<FeaturesGrid />} />
         <Route path="/games" element={<GamesPage />} />
         <Route path="/findpeople" element={<BluetoothFinderPage />} />
         <Route path="/mood" element={<MoodCarousel />} />
         <Route path="/calmzone" element={<CalmZone />} />
-
-        
+        <Route path="/aboutus" element={<AboutUs />} />        
         <Route path="/profile" element={<ProfileSettings />} />
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
         <Route path="/games/flappy-bird" element={<FlappyBird />} />
-      <Route path="/games/paint-grid" element={<JigsawPuzzle />} />
+        <Route path="/games/puzzle" element={<JigsawPuzzle />} />
         <Route path="/games/2048" element={<Game2048 />} />
         <Route path="/games/snake-game" element={<SnakeGame />} />
         <Route path="/icebreakers" element={<IcebreakersBook />} />

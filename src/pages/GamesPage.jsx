@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Volume2, VolumeX } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -43,6 +43,9 @@ const GamesPage = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const navigate = useNavigate();
   
+  // Audio ref for background music
+  const backgroundAudioRef = useRef(null);
+  
   // REPLACE THE IMAGE PATHS WITH YOUR ACTUAL PNG IMAGE PATHS
   const games = [
     { 
@@ -73,6 +76,17 @@ const GamesPage = () => {
     }
   ];
 
+  // Background music control
+  useEffect(() => {
+    if (soundEnabled) {
+      backgroundAudioRef.current.play().catch(err => {
+        console.error('Failed to play audio:', err);
+      });
+    } else if (backgroundAudioRef.current) {
+      backgroundAudioRef.current.pause();
+    }
+  }, [soundEnabled]);
+
   // Sound effect simulation
   useEffect(() => {
     if (soundEnabled && hoveredGame) {
@@ -92,40 +106,46 @@ const GamesPage = () => {
     }, 300);
   };
 
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-amber-50 relative overflow-hidden">
-      {/* Decorative background patterns */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-64 h-64 border-t border-l border-neutral-400 rounded-tl-full"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 border-b border-r border-neutral-400 rounded-br-full"></div>
-        <div className="absolute top-1/4 right-0 w-32 h-32 border-t border-r border-neutral-400 rounded-tr-full opacity-30"></div>
-        <div className="absolute bottom-1/4 left-0 w-32 h-32 border-b border-l border-neutral-400 rounded-bl-full opacity-30"></div>
-      </div>
+      {/* Background audio element */}
+      <audio 
+        ref={backgroundAudioRef}
+        src="src/Assets/gamesaudio.mp3" 
+        volume="0.5"
+        loop
+      />
+      
+      
       
       {/* Header with navigation */}
       <header className="p-6 flex justify-between items-center z-10">
         <Link to="/" className="text-neutral-800 hover:text-neutral-600 transition-colors">
-          <ChevronLeft size={28} />
+          <ChevronLeft size={32} />
         </Link>
         
         <button 
           className="text-neutral-800 hover:text-neutral-600 transition-colors p-2 rounded-full"
-          onClick={() => setSoundEnabled(!soundEnabled)}
+          onClick={toggleSound}
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
       </header>
       
-      {/* Games Title with outline effect */}
       <div className="text-center mb-8 relative z-10">
-        <h1 className="text-6xl font-slackey" style={{ 
+        <h1 className="text-6xl font-slackey animate-bounce-slow" style={{ 
           WebkitTextStroke: '2px #1c1917',
           color: '#EEE7DC',
-          textShadow: '2px 2px 0px rgb(44, 29, 19)'
+          textShadow: '4px 4px 0px rgb(44, 29, 19)'
         }}>
-          GAMES
+          ARCADE
         </h1>
       </div>
+      
       
       {/* Game selection grid */}
       <div className="flex-1 flex justify-center items-center z-10">

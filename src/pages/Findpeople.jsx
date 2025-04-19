@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // Orbiting Profile Pictures Animation Component
@@ -221,8 +221,8 @@ export default function BluetoothFinderPage() {
         {/* Back button */}
       <button 
         onClick={handleBackToWebsite}
-        className="absolute top-8 left-8 z-50 flex items-center text-{#593e25} px-4 py-2 ">
-        <ArrowLeft size={24} className="mr-1" />
+        className="absolute top-7 left-8 z-50 flex items-center text-stone-800 hover:text-amber-800 transition-colors px-4 py-2 rounded-full hover:bg-amber-100">
+        <ChevronLeft size={32} className="mr-1" />
       </button>
 
         <h1 className="text-4xl font-bold text-center flex-grow translate-y-5" style={{ fontFamily: "Slackey", letterSpacing: "2px", color: "#593e25" }}>

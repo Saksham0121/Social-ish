@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
+import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function InterestsPage() {
+  
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(true);
   const [interests, setInterests] = useState({
     hobbies: [],
@@ -42,10 +46,17 @@ function InterestsPage() {
     setIsEditing(true);
   };
 
+  
+  // Handler functions for navigation
+  const handleBackToWebsite = () => {
+    navigate('/');  // Navigate to homepage
+  };
+
   const renderCheckbox = (category, option, label) => {
     const isChecked = interests[category].includes(option);
     return (
       <div className="flex items-center space-x-2">
+         
         <input
           type="checkbox"
           id={`${category}-${option}`}
@@ -67,6 +78,14 @@ function InterestsPage() {
   return (
     <div className="h-screen flex justify-center items-center overflow-hidden " 
          style={{ backgroundImage: "url('src/Assets/bgSocialish.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+
+      {/* Back button */}
+      <button 
+        onClick={handleBackToWebsite}
+        className="absolute top-7 left-8 z-50 bg-{F5F0E7} flex items-center text-stone-800 hover:text-amber-800 transition-colors px-4 py-2 rounded-full hover:bg-amber-100">
+        <ChevronLeft size={32} className="mr-1" />
+      </button>
+
       <div className="w-[80%] h-[90%] bg-[#E2D6C3] rounded-lg p-4 shadow-md border border-[#B29A86] flex flex-col">
         <h1 className="text-4xl font-slackey text-center text-[#5A3E2B] mb-6">Interests</h1>
         <div className="grid grid-cols-2 gap-6 flex-grow">
