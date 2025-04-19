@@ -14,12 +14,12 @@ const MoodCarousel = () => {
   
   // Sample mood cards data - replace URLs with actual YouTube playlist links
   const moodCards = [
-    { id: 1, title: "CALM & COZY", image: "src/Assets/Hufflepuff.jpeg", playlistUrl: "https://www.youtube.com/watch?v=jO2viLEW-1A&list=RDQM6kxYRcZhHgs&start_radio=1" },
-    { id: 2, title: "SOFT & GENTLE", image: "src/Assets/", playlistUrl: "https://youtube.com/playlist?list=PLn7MDcB_f91fNExr4gSl4SiRmE90dy5QF&si=8D0DS3C7bje9VwpE" },
-    { id: 3, title: "SWEET & NOSTALGIC", image: "src/Assets/Ishita_icecream.jpg", playlistUrl: "https://youtu.be/LqgxOmbkvAA?si=ukO8F1NOia7XOpmm"},
+    { id: 1, title: "CALM & COZY", image: "src/Assets/calmCozy.jpeg", playlistUrl: "https://www.youtube.com/watch?v=jO2viLEW-1A&list=RDQM6kxYRcZhHgs&start_radio=1" },
+    { id: 2, title: "SOFT & GENTLE", image: "src/Assets/softGentle.jpeg", playlistUrl: "https://youtube.com/playlist?list=PLn7MDcB_f91fNExr4gSl4SiRmE90dy5QF&si=8D0DS3C7bje9VwpE" },
+    { id: 3, title: "SWEET & NOSTALGIC", image: "src/Assets/sweetNostalgic.jpeg", playlistUrl: "https://youtu.be/LqgxOmbkvAA?si=ukO8F1NOia7XOpmm"},
     { id: 4, title: "UPBEAT & FUN", image: "src/Assets/upbat_and_fun.jpeg", playlistUrl: "https://youtube.com/playlist?list=PLgzTt0k8mXzF2fleyxQ17JxeccHFC8Gxp&si=FbEWoTlD4S5yYWlP" },
     { id: 5, title: "DREAMY & CALM", image: "src/Assets/dreamy_and_calm.jpeg", playlistUrl: "https://youtube.com/playlist?list=PLHixPvcKjkxBmPF7Ty6vk0qJdKaY2Z7XH&si=bP-r05rJY_Farna1" },
-    { id: 6, title: "RELAXED & FOCUS", image: "src/Assets/relaxed_and_focused.jpeg", playlistUrl: "https://youtu.be/xgc1SlB9gk4?si=yQX6IJQA_Jgbwn7z" },
+    { id: 6, title: "RELAXED & FOCUS", image: "src/Assets/relaxedFocus.jpeg", playlistUrl: "https://youtu.be/xgc1SlB9gk4?si=yQX6IJQA_Jgbwn7z" },
     { id: 7, title: "AMBIENT & CHILL", image: "src/Assets/ambient_and_chill.jpeg", playlistUrl: "https://youtu.be/FPEJZ2NN8wE?si=Mg_RnTAcdRL3Oyxs" },
   ];
 

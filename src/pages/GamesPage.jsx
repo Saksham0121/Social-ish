@@ -53,8 +53,8 @@ const GamesPage = () => {
       route: '/games/flappy-bird'
     },
     { 
-      id: 'paint-grid', 
-      cabinetImage: 'src/Assets/Paint grid cabinet.png',
+      id: 'puzzle', 
+      cabinetImage: 'src/Assets/puzzleCabinet.png',
       description: 'Express your creativity by filling in pixels to create amazing art.',
       route: '/games/puzzle'
     },

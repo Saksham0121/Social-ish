@@ -1,46 +1,140 @@
 // ChatApp.jsx
 import { useState, useEffect, useRef } from 'react';
+import { io } from 'socket.io-client';
 
-function ChatApp({ firebaseApp, currentUser }) {
+function ChatApp() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentChat, setCurrentChat] = useState('Saksham');
-  
-  const messagesEndRef = useRef(null);
-  
-  const contacts = [
-    { id: 1, name: 'Saksham', isOnline: true },
+  const [socket, setSocket] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [username, setUsername] = useState('You'); // Default username
+  const [contacts, setContacts] = useState([
+    { id: 1, name: 'Saksham', isOnline: false },
     { id: 2, name: 'Tanisha', isOnline: false },
     { id: 3, name: 'Ishita', isOnline: false },
     { id: 4, name: 'Unnati', isOnline: false },
     { id: 5, name: 'Shaurya', isOnline: false },
-  ];
+  ]);
+  
+  const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
-  // Load messages from localStorage on component mount and when current chat changes
+  // Initialize socket connection
   useEffect(() => {
-    const savedMessages = localStorage.getItem(`chat_${currentChat}`);
+    // Connect to your WebSocket server
+    const newSocket = io('http://localhost:3001');
+    setSocket(newSocket);
+
+    // Handle connection errors
+    newSocket.on('connect_error', (err) => {
+      console.error('Connection error:', err);
+    });
+
+    // Clean up the socket connection when component unmounts
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  // Set up socket event listeners
+  useEffect(() => {
+    if (!socket) return;
+
+    // Register user with the server
+    socket.emit('registerUser', { username });
+    
+    // Set up event listeners
+    socket.on('usersOnline', (users) => {
+      setContacts(prevContacts => 
+        prevContacts.map(contact => ({
+          ...contact,
+          isOnline: users.includes(contact.name)
+        }))
+      );
+    });
+
+    // Listen for incoming messages
+    socket.on('receiveMessage', (message) => {
+      setMessages(prevMessages => [...prevMessages, {
+        id: Date.now() + Math.random(),
+        sender: message.sender,
+        text: message.text,
+        time: message.time
+      }]);
+    });
+
+    // Listen for typing indicators
+    socket.on('userTyping', ({ user, isTyping: typing }) => {
+      if (user !== username && user === currentChat) {
+        setIsTyping(typing);
+        
+        // Clear previous timeout
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        
+        // If they're typing, set a backup timeout to clear the indicator
+        // in case the "stopped typing" event gets lost
+        if (typing) {
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsTyping(false);
+          }, 3000);
+        }
+      }
+    });
+
+    // Join the current chat room
+    socket.emit('joinChat', { sender: username, receiver: currentChat });
+
+    return () => {
+      socket.off('usersOnline');
+      socket.off('receiveMessage');
+      socket.off('userTyping');
+      
+      // Clear any existing typing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [socket, username, currentChat]);
+
+  // Handle chat room changes
+  useEffect(() => {
+    if (!socket) return;
+    
+    // Leave previous room before joining new one
+    socket.emit('leaveChat', { sender: username, receiver: currentChat });
+    socket.emit('joinChat', { sender: username, receiver: currentChat });
+    
+    // Load messages for this conversation
+    const conversationKey = [username, currentChat].sort().join('_');
+    const savedMessages = localStorage.getItem(`chat_conversation_${conversationKey}`);
+    
     if (savedMessages) {
       setMessages(JSON.parse(savedMessages));
     } else {
-      // Initialize with a welcome message
-      const initialMessage = {
-        id: Date.now(),
-        sender: currentChat,
-        text: `Hi there! This is ${currentChat}. How can I help you today?`,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages([initialMessage]);
-      localStorage.setItem(`chat_${currentChat}`, JSON.stringify([initialMessage]));
+      setMessages([]);
     }
-  }, [currentChat]);
+    
+    // Reset typing indicator
+    setIsTyping(false);
+    
+    // Clear typing timeout if it exists
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+  }, [currentChat, socket, username]);
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem(`chat_${currentChat}`, JSON.stringify(messages));
+      const conversationKey = [username, currentChat].sort().join('_');
+      localStorage.setItem(`chat_conversation_${conversationKey}`, JSON.stringify(messages));
     }
-  }, [messages, currentChat]);
+  }, [messages, currentChat, username]);
 
   // Auto-scroll to the bottom when messages change
   useEffect(() => {
@@ -53,75 +147,55 @@ function ChatApp({ firebaseApp, currentUser }) {
   
   const sendMessage = (e) => {
     e.preventDefault();
-    if (newMessage.trim() === '') return;
+    if (newMessage.trim() === '' || !socket) return;
     
-    const userMessage = {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Create message object
+    const messageObj = {
       id: Date.now(),
-      sender: 'You',
+      sender: username,
       text: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      time: time
     };
     
-    setMessages(prevMessages => [...prevMessages, userMessage]);
+    // Add to local messages
+    setMessages(prevMessages => [...prevMessages, messageObj]);
+    
+    // Send to server
+    socket.emit('sendMessage', {
+      sender: username,
+      receiver: currentChat,
+      text: newMessage,
+      time: time
+    });
+    
+    // Stop typing indicator
+    socket.emit('typing', {
+      sender: username, 
+      receiver: currentChat,
+      isTyping: false
+    });
+    
     setNewMessage('');
-    
-    // Simulate a reply after a short delay
-    setTimeout(() => {
-      const replyMessage = {
-        id: Date.now() + 1,
-        sender: currentChat,
-        text: getRandomReply(newMessage),
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages(prevMessages => [...prevMessages, replyMessage]);
-    }, 1000 + Math.random() * 1000);
   };
-  
-  const getRandomReply = (userMessage) => {
-    // Basic context-aware replies
-    const lowercaseMessage = userMessage.toLowerCase();
+
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
     
-    if (lowercaseMessage.includes('hello') || lowercaseMessage.includes('hi') || lowercaseMessage.includes('hey')) {
-      return `Hey there! How's it going?`;
+    // Emit typing event
+    if (socket) {
+      socket.emit('typing', {
+        sender: username, 
+        receiver: currentChat,
+        isTyping: e.target.value.trim() !== ''
+      });
     }
-    
-    if (lowercaseMessage.includes('how are you') || lowercaseMessage.includes('how r u')) {
-      return "I'm doing great, thanks for asking! How about you?";
-    }
-    
-    if (lowercaseMessage.includes('bye') || lowercaseMessage.includes('goodbye') || lowercaseMessage.includes('see you')) {
-      return "Goodbye! Hope to chat again soon!";
-    }
-    
-    if (lowercaseMessage.includes('thank')) {
-      return "You're welcome! Anything else I can help with?";
-    }
-    
-    if (lowercaseMessage.includes('?')) {
-      return "That's an interesting question! Let me think about it...";
-    }
-    
-    // Default random replies if no context matches
-    const replies = [
-      "That's interesting! Tell me more.",
-      "I see what you mean!",
-      "Haha, that's funny!",
-      "Hmm, I'm not sure I understand. Could you elaborate?",
-      "Cool! What else is new?",
-      "I'm glad you reached out!",
-      "Let's talk more about this later!",
-      "I appreciate you sharing that with me.",
-      "Awesome! How's your day going?",
-      "Really? That's amazing!",
-      "I've been thinking about that too!",
-      "Oh wow, I didn't know that!"
-    ];
-    
-    return replies[Math.floor(Math.random() * replies.length)];
   };
   
   const filteredContacts = contacts.filter(contact => 
-    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+    contact.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    contact.name !== username // Don't show yourself in contacts list
   );
   
   // Change the current chat
@@ -133,8 +207,11 @@ function ChatApp({ firebaseApp, currentUser }) {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-80 bg-[#BAA587] border-r flex flex-col">
-        <div className="p-4">
+        <div className="p-4 flex justify-between items-center">
           <h1 className="text-3xl font-slackey font-bold text-[#3A220E]">Friends</h1>
+          <div className="flex items-center">
+            <span className="text-sm mr-2 text-[#3A220E]">{username}</span>
+          </div>
         </div>
         
         {/* Search Bar */}
@@ -175,7 +252,9 @@ function ChatApp({ firebaseApp, currentUser }) {
               </div>
               <div className="ml-3 flex-1">
                 <div className="font-mono font-semibold text-black">{contact.name}</div>
-                <div className="text-sm text-black truncate">{contact.status}</div>
+                <div className="text-sm text-black truncate">
+                  {contact.isOnline ? 'Online' : 'Offline'}
+                </div>
               </div>
             </div>
           ))}
@@ -203,30 +282,46 @@ function ChatApp({ firebaseApp, currentUser }) {
         <div className="flex-1 overflow-y-auto p-4">
           <div className="flex flex-col space-y-4">
             {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.sender === 'You' ? 'justify-end' : 'justify-start'}`}>
-                {message.sender !== 'You' && (
+              <div key={message.id} className={`flex ${message.sender === username ? 'justify-end' : 'justify-start'}`}>
+                {message.sender !== username && (
                   <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center mr-2">
                     <span className="text-sm text-amber-800">
-                      {currentChat.charAt(0)}
+                      {message.sender.charAt(0)}
                     </span>
                   </div>
                 )}
                 <div className="max-w-xs">
-                  {message.sender !== 'You' && (
-                    <div className="text-xs text-black mb-1">{currentChat}</div>
+                  {message.sender !== username && (
+                    <div className="text-xs text-black mb-1">{message.sender}</div>
                   )}
-                  <div className={`p-3 rounded-lg ${message.sender === 'You' ? 'bg-[#624C37] text-white' : 'bg-[#624C37] text-white'}`}>
+                  <div className={`p-3 rounded-lg ${message.sender === username ? 'bg-[#624C37] text-white' : 'bg-[#624C37] text-white'}`}>
                     {message.text}
                   </div>
-                  <div className={`text-xs mt-1 ${message.sender === 'You' ? 'text-right' : ''} text-gray-500`}>
+                  <div className={`text-xs mt-1 ${message.sender === username ? 'text-right' : ''} text-gray-500`}>
                     {message.time}
                   </div>
                 </div>
-                {message.sender === 'You' && (
-                  <div className="ml-2 text-xs text-black self-end">{message.sender}</div>
+                {message.sender === username && (
+                  <div className="ml-2 text-xs text-black self-end">You</div>
                 )}
               </div>
             ))}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center mr-2">
+                  <span className="text-sm text-amber-800">
+                    {currentChat.charAt(0)}
+                  </span>
+                </div>
+                <div className="p-3 rounded-lg bg-[#624C37] text-white">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -237,7 +332,7 @@ function ChatApp({ firebaseApp, currentUser }) {
             <input
               type="text"
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={handleInputChange}
               className="flex-1 py-2 px-4 bg-[#BAA587] rounded-l-full focus:outline-none focus:ring-1 focus:ring-amber-900"
               placeholder="Type a message..."
             />

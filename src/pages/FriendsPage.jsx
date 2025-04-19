@@ -8,13 +8,13 @@ const FriendsPage = () => {
   const [friends, setFriends] = useState([
     { id: 1, username: 'Unnati Sachdeva' },
     { id: 2, username: 'Saksham Sahu' },
-    { id: 3, username: 'Ishita Singh' },
+    { id: 3, username: 'Medha Dikshit' },
     { id: 4, username: 'Saransh Sethi' }
   ]);
 
   const [friendRequests, setFriendRequests] = useState([
     { id: 1, username: 'Tanisha Gupta' },
-    { id: 2, username: 'Medha Dikshit' },
+    { id: 2, username: 'Ishita Singh' },
     { id: 3, username: 'Shaurya Bansal' },
   ]);
 
