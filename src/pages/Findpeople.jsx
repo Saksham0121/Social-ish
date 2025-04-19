@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Orbiting Profile Pictures Animation Component
 const OrbitingProfiles = ({ isScanning }) => {
@@ -130,6 +130,8 @@ export default function BluetoothFinderPage() {
   const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
   const [nearbyPeople, setNearbyPeople] = useState([]);
+  const [friendRequests, setFriendRequests] = useState({});
+  const [notifications, setNotifications] = useState([]);
   
   const toggleScan = () => {
     setIsScanning(!isScanning);
@@ -139,7 +141,7 @@ export default function BluetoothFinderPage() {
       const mockPeople = [
         { 
           id: 1, 
-          name: "Mannat", 
+          name: "Saksham", 
           distance: "5m away", 
           signal: "Strong",
           matchPercentage: 87,
@@ -208,9 +210,59 @@ export default function BluetoothFinderPage() {
       setNearbyPeople([]);
     }
   };
+  
   // Handler functions for navigation
   const handleBackToWebsite = () => {
     navigate('/');
+  };
+  
+  // Handler for sending a connect/friend request
+  const handleConnect = (person) => {
+    // Check if a friend request has already been sent
+    if (friendRequests[person.id]) {
+      return;
+    }
+    
+    // Update the state to track that a friend request has been sent to this person
+    setFriendRequests(prev => ({
+      ...prev,
+      [person.id]: true
+    }));
+    
+    // Show a notification
+    const newNotification = {
+      id: Date.now(),
+      message: `Friend request sent to ${person.name}!`,
+      type: 'success'
+    };
+    
+    setNotifications(prev => [...prev, newNotification]);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== newNotification.id));
+    }, 3000);
+    
+    // Here you would typically make an API call to your backend
+    // Example:
+    // api.sendFriendRequest(person.id)
+    //   .then(() => {
+    //     // Handle success
+    //   })
+    //   .catch(error => {
+    //     // Handle error, maybe remove from friendRequests state
+    //     setFriendRequests(prev => {
+    //       const updated = {...prev};
+    //       delete updated[person.id];
+    //       return updated;
+    //     });
+    //   });
+  };
+  
+  // Handler for opening the chat page
+  const handleMessage = (person) => {
+    // Navigate to chat page with the person's information
+    navigate(`/chatpage/${person.id}`, { state: { person } });
   };
   
   return (
@@ -219,15 +271,38 @@ export default function BluetoothFinderPage() {
       {/* Header */}
       <div className="relative z-10 p-4 flex items-center">
         {/* Back button */}
-      <button 
-        onClick={handleBackToWebsite}
-        className="absolute top-8 left-8 z-50 flex items-center text-{#593e25} px-4 py-2 ">
-        <ArrowLeft size={24} className="mr-1" />
-      </button>
+        <button 
+          onClick={handleBackToWebsite}
+          className="absolute top-8 left-8 z-50 flex items-center text-{#593e25} px-4 py-2 ">
+          <ArrowLeft size={24} className="mr-1" />
+        </button>
 
         <h1 className="text-4xl font-bold text-center flex-grow translate-y-5" style={{ fontFamily: "Slackey", letterSpacing: "2px", color: "#593e25" }}>
           Find People Nearby
         </h1>
+      </div>
+      
+      {/* Notifications */}
+      <div className="fixed top-4 right-4 z-50">
+        {notifications.map((notification) => (
+          <div 
+            key={notification.id}
+            className={`mb-2 p-3 rounded-lg shadow-lg text-white ${
+              notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } transition-opacity duration-300 flex items-center`}
+          >
+            {notification.type === 'success' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            )}
+            {notification.message}
+          </div>
+        ))}
       </div>
       
       {/* Main content */}
@@ -258,8 +333,6 @@ export default function BluetoothFinderPage() {
             
             {/* Scrollable container for the people list */}
             <div className="overflow-y-auto pr-2 custom-scrollbar" style={{ maxHeight: '320px', minHeight: '530px' }}>
-
-
               {nearbyPeople.length > 0 ? (
                 <ul className="space-y-4">
                   {nearbyPeople.map(person => (
@@ -314,11 +387,22 @@ export default function BluetoothFinderPage() {
                       
                       {/* Action buttons */}
                       <div className="flex justify-end space-x-2 mt-2">
-                        <button className="bg-white hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <Link to={'/chat'}
+                          onClick={() => handleMessage(person)}
+                          className="bg-white hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
                           Message
-                        </button>
-                        <button className="bg-amber-700 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                          Connect
+                        </Link>
+                        <button 
+                          onClick={() => handleConnect(person)}
+                          className={`${
+                            friendRequests[person.id] 
+                              ? 'bg-green-600 hover:bg-green-700' 
+                              : 'bg-amber-700 hover:bg-amber-800'
+                          } text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors`}
+                          disabled={friendRequests[person.id]}
+                        >
+                          {friendRequests[person.id] ? 'Request Sent' : 'Connect'}
                         </button>
                       </div>
                     </li>

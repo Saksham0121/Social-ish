@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Edit2, Check, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getAuth, updateProfile, updateEmail } from 'firebase/auth';
+import { getAuth, updateProfile, updateEmail, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
+
 
 const ProfilePage = () => {
   const auth = getAuth();
@@ -156,6 +157,16 @@ const ProfilePage = () => {
       alert("Failed to save changes. Please try again.");
     }
   };
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/');
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Something went wrong while logging out.");
+    }
+  };
+  
 
   if (loading) {
     return (
@@ -471,9 +482,13 @@ const ProfilePage = () => {
           <div className="px-6 py-4 flex justify-end">
             <button 
               onClick={saveAllChanges}
-              className="px-6 py-2 bg-amber-700 text-white rounded-md hover:bg-amber-900 font-medium"
-            >
+              className="px-6 py-2 bg-amber-700 text-white rounded-md hover:bg-amber-900 font-medium">
               Save Changes
+            </button>
+            <button
+              onClick={handleLogout}
+              className="ml-4 bg-amber-700 hover:bg-amber-900 text-white px-6 py-2 rounded-md font-medium">
+              Logout
             </button>
           </div>
       </div>
