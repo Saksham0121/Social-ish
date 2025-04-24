@@ -11,14 +11,17 @@ import FriendsPage from './pages/FriendsPage';
 import InterestsPage from './pages/InterestsPage';
 import { AuthProvider } from './contexts/authContext'; // ✅ Import the AuthProvider
 import IcebreakersBook from './pages/IcebreakerPage';
-import ProfileSettings from './pages/ProfileSettings';
+import ProfilePage from './pages/ProfileSettings';
 import SnakeGame from './Games/snakegame';
 import Game2048 from './Games/2048game';
 import FlappyBird from './Games/flappybird';
 import JigsawPuzzle from './Games/puzzlegame';
 import BluetoothFinderPage from './pages/Findpeople';
+import ChatApp from './pages/ChatPage';
+// import ChatApp from './pages/chating';
 import CalmZone from './pages/calmzone';
 import AboutUs from './pages/aboutus';
+
 
 
 function App() {
@@ -34,15 +37,16 @@ function App() {
         <Route path="/mood" element={<MoodCarousel />} />
         <Route path="/calmzone" element={<CalmZone />} />
         <Route path="/aboutus" element={<AboutUs />} />        
-        <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
         <Route path="/games/flappy-bird" element={<FlappyBird />} />
         <Route path="/games/puzzle" element={<JigsawPuzzle />} />
         <Route path="/games/2048" element={<Game2048 />} />
         <Route path="/games/snake-game" element={<SnakeGame />} />
+        {/* <Route path="/chatpage/:userId" element={<ChatPage />} /> */}
         <Route path="/icebreakers" element={<IcebreakersBook />} />
-
+        <Route path="/chat" element={<ChatApp />} />
       </Routes>
     </AuthProvider>
   );

@@ -6,3 +6,70 @@
 /* @import url("https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Slackey&display=swap"); */
 @import url('https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Slackey&display=swap');
 
+/* Book flip effect with smooth animations */
+.book {
+    perspective: 1500px;
+    transform-style: preserve-3d;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+  }
+  
+  .paper {
+    transform-style: preserve-3d;
+    transform-origin: left;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: transform 1.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .flipped {
+    transform: rotateY(-180deg);
+  }
+  
+  .front,
+  .back {
+    backface-visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+  }
+  
+  .back {
+    transform: rotateY(180deg);
+  }
+  
+  /* Front and back content */
+  .front-content,
+  .back-content {
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+  
+  /* Add paper depth effect */
+  .paper::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 10%);
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  
+  .flipped::after {
+    opacity: 0;
+  }

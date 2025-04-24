@@ -2,8 +2,9 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from 'firebase/firestore';
 
+// ✅ Load from environment variable
 const firebaseConfig = {
-  apiKey: "AIzaSyD9Fsy1-2_s2M0oGNQaZUxQE3h2kHD0c0c",
+  apiKey: import.meta.env.VITE_API_KEY,
   authDomain: "social-ish-5bd46.firebaseapp.com",
   projectId: "social-ish-5bd46",
   storageBucket: "social-ish-5bd46.firebasestorage.app",

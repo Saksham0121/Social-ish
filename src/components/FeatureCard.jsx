@@ -16,7 +16,7 @@ const features = [
     title: 'Games',
     position: 'left-[29%] top-[30%]',
     zIndex: 'z-40',
-    width: 'w-72',
+    width: 'w-76',
     height: 'h-52',
     route: '/games'
   },
