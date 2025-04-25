@@ -21,6 +21,7 @@ import ChatApp from './pages/ChatPage';
 // import ChatApp from './pages/chating';
 import CalmZone from './pages/calmzone';
 import AboutUs from './pages/aboutus';
+import HelpAndSupport from './pages/helppage';
 
 
 
@@ -38,6 +39,8 @@ function App() {
         <Route path="/calmzone" element={<CalmZone />} />
         <Route path="/aboutus" element={<AboutUs />} />        
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/help" element={<HelpAndSupport />} />
+
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
         <Route path="/games/flappy-bird" element={<FlappyBird />} />
