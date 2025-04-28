@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const features = [
   { 
     image: "src/Assets/Interests_card.png", 
-    title: 'Interests',
-    position: 'left-[4%] top-[37%]',
+    position: 'left-[1%] top-[37%]',
     zIndex: 'z-30',
     width: 'w-64',
     height: 'h-68',
@@ -13,8 +12,7 @@ const features = [
   },
   { 
     image: "src/Assets/Games_card.png", 
-    title: 'Games',
-    position: 'left-[29%] top-[30%]',
+    position: 'left-[32%] top-[28%]',
     zIndex: 'z-40',
     width: 'w-76',
     height: 'h-52',
@@ -22,8 +20,7 @@ const features = [
   },
   { 
     image: "src/Assets/Music_card.png", 
-    title: 'Music',
-    position: 'right-[12%] top-[27%]',
+    position: 'right-[9%] top-[26%]',
     zIndex: 'z-50',
     width: 'w-80',
     height: 'h-100',
@@ -31,8 +28,7 @@ const features = [
   },
   { 
     image: "src/Assets/Findpeople_card.png", 
-    title: 'Find People',
-    position: 'left-[25%] top-[58%]',
+    position: 'left-[25%] top-[51%]',
     zIndex: 'z-40',
     width: 'w-68',
     height: 'h-64',
@@ -40,8 +36,7 @@ const features = [
   },
   { 
     image: "src/Assets/Icebreakers_card.png", 
-    title: 'Icebreakers',
-    position: 'right-[23%] top-[4%]',
+    position: 'right-[19%] top-[4%]',
     zIndex: 'z-60',
     width: 'w-84',
     height: 'h-60',
@@ -49,8 +44,7 @@ const features = [
   },
   { 
     image: "src/Assets/Calzone_card.png", 
-    title: 'Calm Zone',
-    position: 'left-[9%] top-[10%]',
+    position: 'left-[9%] top-[8%]',
     zIndex: 'z-10',
     width: 'w-80',
     height: 'h-68',
@@ -61,29 +55,19 @@ const features = [
 const FeatureCard = ({ image, title, position, zIndex, width, height, isHovered, onHover, onLeave, route }) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate(route);
-  };
-
   return (
-    <div 
-      className={`
-        absolute ${position} ${zIndex}
-        transition-all duration-300 ease-in-out
-        ${isHovered ? '-translate-y-8' : ''}
-        cursor-pointer
-        ${width} ${height}
-      `}
-      style={{
-        transformOrigin: 'center'
-      }}
+    <div
+      className={`absolute flex flex-col items-center justify-start  transition-all duration-300 ease-in-out cursor-pointer ${zIndex} ${position} ${width} ${height} ${
+        isHovered ? '-translate-y-8 scale-105' : ''
+      }`}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      onClick={handleClick}
+      onClick={() => navigate(route)}
     >
-      <img 
-        src={image} 
-        alt={title} 
+      <h2 className="text-lg font-bold text-black mb-2 text-center">{title}</h2>
+      <img
+        src={image}
+        alt={title}
         className="w-full h-full object-contain"
       />
     </div>
@@ -94,7 +78,7 @@ const FeaturesGrid = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
-    <div className=" relative w-full h-screen overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
       {features.map((feature, index) => (
         <FeatureCard
           key={index}

@@ -12,7 +12,7 @@ export default function HelpAndSupport() {
   const handleSectionClick = (section) => {
     setActiveSection(section);
   };
-
+ 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-100 text-gray-800 p-4 md:p-8">
         <Link to="/" className="text-neutral-800 hover:text-neutral-600 transition-colors">

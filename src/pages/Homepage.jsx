@@ -20,7 +20,7 @@ const HomePage = () => {
       <div className="flex">
         <div className="w-2/5 p-12 flex items-center">
           <div>
-            <h1 className="font-darumadrop text-7xl -translate-y-20 font-bold mb-6 text-[#3A220E]">
+            <h1 className="font-darumadrop text-6xl -translate-y-20 font-bold mb-6 text-[#3A220E]">
               Just The Right Amount of Social.
             </h1>
             <p className="text-xl text-brown -translate-y-20 mb-8">
