@@ -1,98 +1,104 @@
-// server.js (ESM version)
+// server.js
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-require('dotenv').config();
+import dotenv from 'dotenv'; // Import dotenv for environment variables
 
+dotenv.config(); // Load environment variables
+
+// Create Express app and HTTP server
 const app = express();
 app.use(cors());
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "*", // In production, replace with your frontend URL
     methods: ["GET", "POST"]
   }
 });
 
-// Track connected users and their socket ids
-const connectedUsers = new Map(); // username -> socketId
-const userSockets = new Map();     // socketId -> username
-
-// Track private chat rooms between users
-const privateRooms = new Map(); // "user1_user2" -> roomId
+// Store active users and their socket IDs
+const activeUsers = new Map(); // userId -> socketId
+const socketToUser = new Map(); // socketId -> userId
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log(`User connected: ${socket.id}`);
 
-  // Register user when they login
-  socket.on('registerUser', ({ username }) => {
-    connectedUsers.set(username, socket.id);
-    userSockets.set(socket.id, username);
+  // User registration
+  socket.on('registerUser', ({ userId, username }) => {
+    console.log(`User registered: ${username} (${userId})`);
     
-    console.log(`User ${username} registered with socket ${socket.id}`);
+    // Store user info
+    activeUsers.set(userId, socket.id);
+    socketToUser.set(socket.id, userId);
     
-    const onlineUsers = Array.from(connectedUsers.keys());
-    io.emit('usersOnline', onlineUsers);
+    // Broadcast updated online users list
+    broadcastOnlineUsers();
   });
 
-  // Join private chat
+  // Join a chat room
   socket.on('joinChat', ({ sender, receiver }) => {
-    const roomName = [sender, receiver].sort().join('_');
-    socket.join(roomName);
-    privateRooms.set(roomName, roomName);
-    console.log(`${sender} joined room ${roomName} to chat with ${receiver}`);
+    const roomId = [sender, receiver].sort().join('_');
+    socket.join(roomId);
+    console.log(`User ${sender} joined room: ${roomId}`);
   });
 
-  // Leave private chat
+  // Leave a chat room
   socket.on('leaveChat', ({ sender, receiver }) => {
-    const roomName = [sender, receiver].sort().join('_');
-    socket.leave(roomName);
-    console.log(`${sender} left room ${roomName}`);
+    const roomId = [sender, receiver].sort().join('_');
+    socket.leave(roomId);
+    console.log(`User ${sender} left room: ${roomId}`);
   });
 
-  // Send message
-  socket.on('sendMessage', ({ sender, receiver, text, time }) => {
-    const roomName = [sender, receiver].sort().join('_');
-    socket.to(roomName).emit('receiveMessage', { sender, text, time });
-    console.log(`Message from ${sender} to ${receiver} in room ${roomName}`);
+  // Handle messages
+  socket.on('sendMessage', (message) => {
+    const { sender, receiver, text, time } = message;
+    const roomId = [sender, receiver].sort().join('_');
+    
+    console.log(`Message in room ${roomId}: ${text}`);
+    
+    // Broadcast to everyone in the room including sender for consistency
+    io.to(roomId).emit('receiveMessage', message);
   });
 
-  // Typing indicator
+  // Handle typing indicators
   socket.on('typing', ({ sender, receiver, isTyping }) => {
-    const roomName = [sender, receiver].sort().join('_');
-    socket.to(roomName).emit('userTyping', { user: sender, isTyping });
+    const roomId = [sender, receiver].sort().join('_');
+    
+    // Send to receiver
+    socket.to(roomId).emit('userTyping', {
+      user: sender,
+      isTyping
+    });
   });
 
-  // Explicit logout
-  socket.on('userLogout', ({ username }) => {
-    if (connectedUsers.has(username)) {
-      connectedUsers.delete(username);
-      userSockets.delete(socket.id);
-      io.emit('usersOnline', Array.from(connectedUsers.keys()));
-      console.log(`User ${username} logged out`);
-    }
-  });
-
-  // Handle disconnect
+  // Handle disconnection
   socket.on('disconnect', () => {
-    const username = userSockets.get(socket.id);
-    if (username) {
-      connectedUsers.delete(username);
-      userSockets.delete(socket.id);
-      io.emit('usersOnline', Array.from(connectedUsers.keys()));
-      console.log(`User ${username} disconnected`);
+    const userId = socketToUser.get(socket.id);
+    
+    if (userId) {
+      console.log(`User disconnected: ${userId}`);
+      activeUsers.delete(userId);
+      socketToUser.delete(socket.id);
+      
+      // Broadcast updated online users
+      broadcastOnlineUsers();
     }
   });
-});
 
-// Health check route
-app.get('/health', (req, res) => {
-  res.send('Server is running');
+  // Function to broadcast online users
+  function broadcastOnlineUsers() {
+    const onlineUsers = Array.from(activeUsers.keys()).map(id => ({
+      userId: id
+    }));
+    
+    io.emit('usersOnline', onlineUsers);
+  }
 });
+const PORT = process.env.PORT || 3002; // Change to another available port
 
-const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Socket.io server running on port ${PORT}`);
 });

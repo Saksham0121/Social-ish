@@ -17,8 +17,7 @@ import Game2048 from './Games/2048game';
 import FlappyBird from './Games/flappybird';
 import JigsawPuzzle from './Games/puzzlegame';
 import BluetoothFinderPage from './pages/Findpeople';
-import ChatApp from './pages/ChatPage';
-// import ChatApp from './pages/chating';
+import ChatComponent from './pages/ChatPage';
 import CalmZone from './pages/calmzone';
 import AboutUs from './pages/aboutus';
 import HelpAndSupport from './pages/helppage';
@@ -49,7 +48,7 @@ function App() {
         <Route path="/games/snake-game" element={<SnakeGame />} />
         {/* <Route path="/chatpage/:userId" element={<ChatPage />} /> */}
         <Route path="/icebreakers" element={<IcebreakersBook />} />
-        <Route path="/chat" element={<ChatApp />} />
+        <Route path="/chat" element={<ChatComponent />} />
       </Routes>
     </AuthProvider>
   );

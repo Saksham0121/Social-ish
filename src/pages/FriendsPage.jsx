@@ -254,7 +254,7 @@ const FriendsPage = () => {
 
   // Handle chat button click
   const handleChatClick = (friendId) => {
-    navigate(`/chat/${friendId}`);
+    navigate(`/chat`);
   };
 
   // Handle searching for users
