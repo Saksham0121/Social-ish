@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react';
+import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function BookPageTurner() {
+  const navigate = useNavigate();
+
   const [currentLocation, setCurrentLocation] = useState(1);
   const [isPageTurning, setIsPageTurning] = useState(false);
   const numOfPapers = 7;
   const maxLocation = numOfPapers + 1;
   const [pageSound] = useState(new Audio('/page-flip.mp3'));
+
+  // Handler functions for navigation
+  const handleBackToWebsite = () => {
+    navigate('/');
+  };
 
   const icebreakers = [
     "What's something you've always wanted to learn or try but haven't yet?",
@@ -85,6 +94,12 @@ export default function BookPageTurner() {
           filter: "brightness(0.9) contrast(1.1)"
         }}
       ></div>
+      {/* Back button */}
+      <button 
+        onClick={handleBackToWebsite}
+        className="absolute top-7 left-8 z-50 flex items-center text-stone-800 hover:text-amber-800 transition-colors px-4 py-2 rounded-full hover:bg-amber-100 ">
+        <ChevronLeft size={32} className="mr-1" />
+      </button>
       
       {/* Ambient lighting effect */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-amber-950/30"></div>

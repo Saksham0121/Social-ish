@@ -21,6 +21,7 @@ import ChatComponent from './pages/ChatPage';
 import CalmZone from './pages/calmzone';
 import AboutUs from './pages/aboutus';
 import HelpAndSupport from './pages/helppage';
+import ForgotPassword from './components/ForgotPassword';
 
 
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/features" element={<FeaturesGrid />} />
         <Route path="/games" element={<GamesPage />} />
         <Route path="/findpeople" element={<BluetoothFinderPage />} />
@@ -39,14 +41,12 @@ function App() {
         <Route path="/aboutus" element={<AboutUs />} />        
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/help" element={<HelpAndSupport />} />
-
         <Route path="/friendspage" element={<FriendsPage />} />
         <Route path="/interests" element={<InterestsPage />} />
         <Route path="/games/flappy-bird" element={<FlappyBird />} />
         <Route path="/games/puzzle" element={<JigsawPuzzle />} />
         <Route path="/games/2048" element={<Game2048 />} />
         <Route path="/games/snake-game" element={<SnakeGame />} />
-        {/* <Route path="/chatpage/:userId" element={<ChatPage />} /> */}
         <Route path="/icebreakers" element={<IcebreakersBook />} />
         <Route path="/chat" element={<ChatComponent />} />
       </Routes>
