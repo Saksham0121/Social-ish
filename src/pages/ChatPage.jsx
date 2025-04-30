@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
-import { Search, Send, ArrowLeft } from 'lucide-react';
+import { Search, Send } from 'lucide-react';
 
 function ChatComponent() {
   const [messages, setMessages] = useState([]);
