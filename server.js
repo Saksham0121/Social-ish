@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
 
   // Handle messages
   socket.on('sendMessage', (message) => {
-    const { sender, receiver, text, time } = message;
+    const { sender, receiver, text} = message;
     const roomId = [sender, receiver].sort().join('_');
     
     console.log(`Message in room ${roomId}: ${text}`);

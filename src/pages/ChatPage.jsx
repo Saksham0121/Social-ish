@@ -114,15 +114,16 @@ function ChatComponent() {
     // Listen for incoming messages
     socket.on('receiveMessage', (message) => {
       if (message.sender === currentChat?.id || message.receiver === currentChat?.id) {
-        setMessages(prevMessages => [...prevMessages, {
-          id: Date.now() + Math.random(),
-          sender: message.sender,
-          receiver: message.receiver,
-          text: message.text,
-          time: message.time
-        }]);
+        setMessages(prevMessages => {
+          const alreadyExists = prevMessages.some(m => m.id === message.id);
+          if (!alreadyExists) {
+            return [...prevMessages, message];
+          }
+          return prevMessages;
+        });
       }
     });
+    
 
     // Listen for typing indicators
     socket.on('userTyping', ({ user, isTyping: typing }) => {
@@ -208,34 +209,36 @@ function ChatComponent() {
   
   const sendMessage = (e) => {
     e.preventDefault();
+  
     if (newMessage.trim() === '' || !socket || !currentChat) return;
-    
+  
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
+  
+    // Create unique ID
+    const messageId = `${Date.now()}_${userId}`;
+  
     // Create message object
     const messageObj = {
-      id: Date.now(),
+      id: messageId,
       sender: userId,
       receiver: currentChat.id,
       text: newMessage,
       time: time
     };
-    
-    // Add to local messages
-    setMessages(prevMessages => [...prevMessages, messageObj]);
-    
+  
     // Send to server
     socket.emit('sendMessage', messageObj);
-    
+  
     // Stop typing indicator
     socket.emit('typing', {
-      sender: userId, 
+      sender: userId,
       receiver: currentChat.id,
       isTyping: false
     });
-    
+  
     setNewMessage('');
   };
+    
 
   const handleInputChange = (e) => {
     setNewMessage(e.target.value);
@@ -284,7 +287,7 @@ function ChatComponent() {
       {/* Sidebar */}
       <div className="w-80 bg-[#BAA587] border-r flex flex-col">
         <div className="p-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-[#3A220E]">Friends</h1>
+          <h1 className="text-3xl font-slackey text-[#3A220E]">Friends</h1>
           <div className="flex items-center">
             <span className="text-sm mr-2 text-[#3A220E]">{username}</span>
           </div>
